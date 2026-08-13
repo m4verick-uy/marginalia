@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>marginaLia</title>
+<script>
+  (function () {
+    var theme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', theme);
+  })();
+</script>
+<style>
+  :root {
+    --bg: #0b0b0d;
+    --surface: #16161a;
+    --border: #26262b;
+    --text: #ececec;
+    --text-dim: #9a9a9f;
+    --accent: #6d8cff;
+  }
+  html[data-theme="light"] {
+    --bg: #f7f7f8;
+    --surface: #ffffff;
+    --border: #e2e2e5;
+    --text: #16161a;
+    --text-dim: #6b6b70;
+    --accent: #3a5cff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+  }
+  #login, #app { display: none; }
+</style>
+</head>
+<body>
+
+<div id="login">
+  <!-- Login se implementa vía Orchestrator: feature "Login Google + multiusuario" -->
+</div>
+
+<div id="app">
+  <!-- App principal se implementa feature por feature vía Orchestrator -->
+</div>
+
+<script type="module">
+  // El bootstrap de Firebase Auth y Firestore se agrega como parte de la
+  // primera feature (Login Google + multiusuario) vía la Software Factory.
+</script>
+
+</body>
+</html>
