@@ -24,8 +24,6 @@
     --accent: #6d8cff;
     --accent-contrast: #05060f;
     --danger: #ff375f;
-    --success: #30d158;
-    --warning: #ffd60a;
 
     --radius: 12px;
     --radius-sm: 8px;
@@ -34,9 +32,9 @@
     /* Paleta de área — mapeo por índice (ver areaColorIndex en JS).
        Vive solo en dots/badges, nunca en píldoras de filtro. */
     --p0: #ff9f0a;
-    --p1: #30d158;
+    --p1: #ff375f;
     --p2: #0a84ff;
-    --p3: #ff375f;
+    --p3: #30d158;
     --p4: #bf5af2;
     --p5: #ffd60a;
     --p6: #73daca;
@@ -54,13 +52,11 @@
     --accent: #3a5cff;
     --accent-contrast: #ffffff;
     --danger: #ff2d55;
-    --success: #34c759;
-    --warning: #ffcc00;
 
     --p0: #ff9500;
-    --p1: #34c759;
+    --p1: #ff2d55;
     --p2: #007aff;
-    --p3: #ff2d55;
+    --p3: #34c759;
     --p4: #af52de;
     --p5: #ffcc00;
     --p6: #1a7a65;
@@ -463,20 +459,6 @@
   .area-p9 .area-dot { background: var(--p9); }
 
   .book-rating { color: var(--accent); font-size: 12px; letter-spacing: 1px; }
-
-  .status-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--text-dim);
-    flex-shrink: 0;
-    display: inline-block;
-    margin-right: 6px;
-  }
-
-  .status-pendiente .status-dot { background: var(--warning); }
-  .status-leyendo .status-dot { background: var(--success); }
-  .status-leido .status-dot { background: var(--danger); }
 
   .book-card-actions { display: flex; gap: 2px; flex-shrink: 0; }
 
@@ -1098,7 +1080,7 @@ function renderBookCard(b) {
         ${authorsHtml}
         <div class="book-meta">
           <span class="badge area-p${colorIdx}"><span class="area-dot"></span>${escHtml(b.area)}</span>
-          <span class="badge status-${b.status}"><span class="status-dot"></span>${statusLabel}</span>
+          <span class="badge">${statusLabel}</span>
           ${ratingHtml}
         </div>
       </div>
