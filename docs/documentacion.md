@@ -9,6 +9,19 @@ de datos completo.
 Fase 1, MVP, Entrega 1. Features implementadas: Login Google + multiusuario,
 Alta manual de libro + lista con filtros.
 
+## Nota de alcance: portadas (`cover`)
+
+El campo `cover` (URL de portada) existe en el form de alta/edición desde la
+Entrega 1 (CLAUDE.md pide "todos los campos del modelo, todos editables"),
+pero **no se renderiza en ningún lado todavía** — no hay `<img>` conectado a
+ese campo. Es intencional, no un bug: CLAUDE.md escopea explícitamente la
+"grilla tipo estantería" con portadas a la Entrega 2, junto con el
+autocompletado de Google Books/OpenLibrary (que va a traer la URL de portada
+automáticamente). Decisión confirmada con el Ingeniero Jefe el 2026-08-14:
+no adelantar esto a la Entrega 1, y no agregar Firebase Storage / subida de
+archivos — `cover` sigue siendo una URL, tal como especifica el modelo de
+datos.
+
 ## Proyecto Firebase
 
 marginaLia usa un **proyecto Firebase propio**, separado del de ReMynder —
