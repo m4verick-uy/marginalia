@@ -24,6 +24,7 @@
     --accent: #6d8cff;
     --accent-contrast: #05060f;
     --danger: #ff375f;
+    --success: #30d158;
 
     --radius: 12px;
     --radius-sm: 8px;
@@ -52,6 +53,7 @@
     --accent: #3a5cff;
     --accent-contrast: #ffffff;
     --danger: #ff2d55;
+    --success: #34c759;
 
     --p0: #ff9500;
     --p1: #34c759;
@@ -459,6 +461,9 @@
   .area-p9 .area-dot { background: var(--p9); }
 
   .book-rating { color: var(--accent); font-size: 12px; letter-spacing: 1px; }
+
+  .badge.status-leido { color: var(--danger); }
+  .badge.status-leyendo { color: var(--success); }
 
   .book-card-actions { display: flex; gap: 2px; flex-shrink: 0; }
 
@@ -1080,7 +1085,7 @@ function renderBookCard(b) {
         ${authorsHtml}
         <div class="book-meta">
           <span class="badge area-p${colorIdx}"><span class="area-dot"></span>${escHtml(b.area)}</span>
-          <span class="badge">${statusLabel}</span>
+          <span class="badge status-${b.status}">${statusLabel}</span>
           ${ratingHtml}
         </div>
       </div>
