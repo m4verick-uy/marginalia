@@ -606,6 +606,71 @@
   }
   .board-dot.active { background: var(--accent); }
 
+  /* ── Distribución (torta por área) ── */
+  #distribution { display: none; }
+
+  .chart-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    padding: 1rem 0 2rem;
+  }
+
+  .pie-chart {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    position: relative;
+    flex-shrink: 0;
+    background: var(--border);
+  }
+
+  .pie-hole {
+    position: absolute;
+    inset: 22%;
+    background: var(--bg);
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .pie-total {
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.1;
+  }
+
+  .pie-total-label {
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+
+  .pie-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .pie-legend-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .pie-legend-pct {
+    font-size: 13px;
+    color: var(--text-dim);
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+  }
+
   @media (max-width: 480px) {
     .book-card { flex-direction: column; }
     .book-card-actions { align-self: flex-end; margin-top: -8px; }
@@ -655,6 +720,7 @@
         <div class="view-switch" id="view-switch">
           <button class="view-switch-btn" data-view="list" type="button">Lista</button>
           <button class="view-switch-btn" data-view="board" type="button">Tablero</button>
+          <button class="view-switch-btn" data-view="distribution" type="button">Distribución</button>
         </div>
         <button class="theme-btn" id="theme-btn" aria-label="Cambiar tema" type="button"></button>
         <img id="user-avatar" class="avatar" src="" alt="" />
@@ -774,6 +840,19 @@
     <div id="board" class="board"></div>
     <div class="board-dots" id="board-dots"></div>
     <div class="empty" id="empty-state" style="display:none"></div>
+
+    <div id="distribution">
+      <div class="chart-wrap" id="chart-wrap">
+        <div class="pie-chart" id="pie-chart">
+          <div class="pie-hole">
+            <span class="pie-total" id="pie-total">0</span>
+            <span class="pie-total-label">libros</span>
+          </div>
+        </div>
+        <div class="pie-legend" id="pie-legend"></div>
+      </div>
+      <div class="empty" id="distribution-empty" style="display:none"></div>
+    </div>
   </main>
 </div>
 
@@ -1272,20 +1351,71 @@ function updateViewSwitch() {
 }
 
 function render() {
-  renderAreaFilters();
-
   const isBoard = viewMode === 'board';
-  document.getElementById('status-filters').style.display = isBoard ? 'none' : 'contents';
-  document.getElementById('book-list').style.display = isBoard ? 'none' : 'flex';
-  document.getElementById('board').style.display = isBoard ? 'flex' : 'none';
+  const isDistribution = viewMode === 'distribution';
 
-  if (isBoard) {
+  document.getElementById('filters').style.display = isDistribution ? 'none' : 'flex';
+  if (!isDistribution) {
+    renderAreaFilters();
+    document.getElementById('status-filters').style.display = isBoard ? 'none' : 'contents';
+  }
+
+  document.getElementById('book-list').style.display = (!isBoard && !isDistribution) ? 'flex' : 'none';
+  document.getElementById('board').style.display = isBoard ? 'flex' : 'none';
+  document.getElementById('distribution').style.display = isDistribution ? 'block' : 'none';
+
+  if (isDistribution) {
+    document.getElementById('empty-state').style.display = 'none';
+    document.getElementById('board-dots').style.display = 'none';
+    renderDistribution();
+  } else if (isBoard) {
     document.getElementById('empty-state').style.display = 'none';
     renderBoard();
   } else {
     document.getElementById('board-dots').style.display = 'none';
     renderBookList();
   }
+}
+
+// ── Distribución (torta por área) ───────────────────────────────
+function renderDistribution() {
+  const total = books.length;
+  const chartWrapEl = document.getElementById('chart-wrap');
+  const emptyEl = document.getElementById('distribution-empty');
+  const chartEl = document.getElementById('pie-chart');
+  const legendEl = document.getElementById('pie-legend');
+
+  if (total === 0) {
+    chartWrapEl.style.display = 'none';
+    emptyEl.textContent = 'Todavía no cargaste ningún libro. Empezá tu bitácora con el botón de arriba.';
+    emptyEl.style.display = '';
+    return;
+  }
+
+  emptyEl.style.display = 'none';
+  chartWrapEl.style.display = 'flex';
+  document.getElementById('pie-total').textContent = total;
+
+  const areas = getAreaOptions();
+  let acc = 0;
+  const stops = areas.map(area => {
+    const count = books.filter(b => b.area === area).length;
+    const pct = (count / total) * 100;
+    const start = acc;
+    acc += pct;
+    return `var(--p${areaColorIndex(area)}) ${start}% ${acc}%`;
+  });
+  chartEl.style.background = `conic-gradient(${stops.join(', ')})`;
+
+  legendEl.innerHTML = areas.map(area => {
+    const count = books.filter(b => b.area === area).length;
+    const pct = Math.round((count / total) * 1000) / 10;
+    return `
+      <div class="pie-legend-row">
+        <span class="badge area-p${areaColorIndex(area)}"><span class="area-dot"></span>${escHtml(area)}</span>
+        <span class="pie-legend-pct">${pct}%</span>
+      </div>`;
+  }).join('');
 }
 
 // ── XSS sanitization ────────────────────────────────────────────

@@ -7,7 +7,8 @@ de datos completo.
 ## Estado actual
 
 Fase 1, MVP, Entrega 1. Features implementadas: Login Google + multiusuario,
-Alta manual de libro + lista con filtros, Board Kanban sobre status.
+Alta manual de libro + lista con filtros, Board Kanban sobre status, Torta
+de distribución por área.
 
 ## Nota de alcance: portadas (`cover`)
 
@@ -58,6 +59,26 @@ autorizada — el login solo funciona en los dos dominios estables de arriba.
   sea accesible por cualquier usuario, no solo por cuentas del team de Vercel
 
 ## Historial de cambios arquitecturales
+
+### 2026-08-14 — Torta de distribución por área
+- Tercera vista en `.view-switch` (Lista/Tablero/**Distribución**)
+- Gráfico de torta en **CSS puro** (`conic-gradient` + círculo superpuesto
+  para efecto donut, total de libros en el centro) — evaluado explícitamente
+  no agregar ninguna librería de gráficos, según la regla de CLAUDE.md de
+  sin dependencias innecesarias
+- Reutiliza `areaColorIndex()` (ya existente) como única fuente de verdad de
+  color por área — el color de un área es el mismo en Lista, Tablero y
+  Distribución
+- Leyenda reutiliza el mismo patrón visual `.badge.area-pN` + `.area-dot`
+  que ya usan las tarjetas de libro
+- `.filters` se oculta completo en esta vista (a diferencia de Tablero, que
+  solo oculta el filtro de status) — la torta muestra siempre el 100% de
+  los libros, sin filtrar
+- Docs: docs/research-torta-areas.md, docs/stories-torta-areas.md,
+  docs/spec-torta-areas.md, docs/test-report-torta-areas.md,
+  docs/validation-torta-areas.md
+- Pendiente: verificación manual en navegador (confirmar que los colores
+  coinciden entre vistas) — no se hizo en esta sesión
 
 ### 2026-08-14 — Board Kanban sobre status
 - Segunda vista de los libros (además de la Lista): selector `.view-switch`
