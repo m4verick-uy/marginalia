@@ -53,6 +53,15 @@ autorizada — el login solo funciona en los dos dominios estables de arriba.
 - Proyecto Vercel: `m4vericks-projects/marginalia`
 - URL de producción: **https://marginalia-uy.vercel.app** (alias manual;
   `marginalia.vercel.app` a secas ya estaba tomado por otro proyecto global)
+- **⚠️ `marginalia-uy.vercel.app` NO sigue automáticamente los nuevos
+  deploys de producción** — es un alias creado a mano
+  (`vercel alias set <deployment> marginalia-uy.vercel.app`), no el dominio
+  oficial del proyecto. Después de cada `git push origin produccion`, hay
+  que re-apuntarlo al deployment nuevo con ese mismo comando (o buscar el
+  último deployment con `vercel ls marginalia`). El dominio que SÍ sigue los
+  deploys automáticamente es `marginalia-m4vericks-projects.vercel.app` —
+  usarlo como referencia confiable si `marginalia-uy.vercel.app` parece
+  desactualizado.
 - Vercel Deployment Protection (SSO) estaba habilitada por defecto en el
   proyecto nuevo y bloqueaba el acceso público — se desactivó
   (`vercel project protection disable marginalia --sso`) para que el login
