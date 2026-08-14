@@ -17,8 +17,17 @@ Auth Google + Firestore, sin infraestructura compartida entre productos.
 Proyecto real: `marginalia-68e0a`. `firebaseConfig` en `web/index.html` tiene
 los valores reales (2026-08-13). Google habilitado en Authentication,
 Firestore Database creada, Security Rules de `users/{userId}/books/{bookId}`
-aplicadas, dominio de Vercel autorizado — **login verificado funcionando en
-producción el 2026-08-14**.
+aplicadas — **login verificado funcionando el 2026-08-14** tanto en
+producción como en preview.
+
+Authorized domains en Firebase:
+- `marginalia-uy.vercel.app` (producción)
+- `marginalia-git-develop-m4vericks-projects.vercel.app` (preview de `develop`
+  — dominio estable por rama, no cambia en cada deploy)
+
+Nota: cada deployment individual de Vercel tiene además su propia URL
+efímera (`marginalia-<hash>-m4vericks-projects.vercel.app`) que no está
+autorizada — el login solo funciona en los dos dominios estables de arriba.
 
 ## Infraestructura de hosting y Git
 
