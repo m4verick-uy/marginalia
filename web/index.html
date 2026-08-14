@@ -25,6 +25,7 @@
     --accent-contrast: #05060f;
     --danger: #ff375f;
     --success: #30d158;
+    --warning: #ffd60a;
 
     --radius: 12px;
     --radius-sm: 8px;
@@ -54,6 +55,7 @@
     --accent-contrast: #ffffff;
     --danger: #ff2d55;
     --success: #34c759;
+    --warning: #ffcc00;
 
     --p0: #ff9500;
     --p1: #34c759;
@@ -462,8 +464,19 @@
 
   .book-rating { color: var(--accent); font-size: 12px; letter-spacing: 1px; }
 
-  .badge.status-leido { color: var(--danger); }
-  .badge.status-leyendo { color: var(--success); }
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--text-dim);
+    flex-shrink: 0;
+    display: inline-block;
+    margin-right: 6px;
+  }
+
+  .status-pendiente .status-dot { background: var(--warning); }
+  .status-leyendo .status-dot { background: var(--success); }
+  .status-leido .status-dot { background: var(--danger); }
 
   .book-card-actions { display: flex; gap: 2px; flex-shrink: 0; }
 
@@ -1085,7 +1098,7 @@ function renderBookCard(b) {
         ${authorsHtml}
         <div class="book-meta">
           <span class="badge area-p${colorIdx}"><span class="area-dot"></span>${escHtml(b.area)}</span>
-          <span class="badge status-${b.status}">${statusLabel}</span>
+          <span class="badge status-${b.status}"><span class="status-dot"></span>${statusLabel}</span>
           ${ratingHtml}
         </div>
       </div>
