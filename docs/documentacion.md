@@ -7,7 +7,7 @@ de datos completo.
 ## Estado actual
 
 Fase 1, MVP, Entrega 1. Features implementadas: Login Google + multiusuario,
-Alta manual de libro + lista con filtros.
+Alta manual de libro + lista con filtros, Board Kanban sobre status.
 
 ## Nota de alcance: portadas (`cover`)
 
@@ -58,6 +58,26 @@ autorizada — el login solo funciona en los dos dominios estables de arriba.
   sea accesible por cualquier usuario, no solo por cuentas del team de Vercel
 
 ## Historial de cambios arquitecturales
+
+### 2026-08-14 — Board Kanban sobre status
+- Segunda vista de los libros (además de la Lista): selector `.view-switch`
+  en el header, `viewMode` persistido en `localStorage`
+- 4 columnas por `status` (`pendiente|leyendo|leido|abandonado`), portado del
+  `.board` de ReMynder: drag-and-drop nativo con delegación de eventos vía
+  `AbortController`, columna vacía siempre visible como zona de drop,
+  carrusel mobile con `scroll-snap` + dots
+- Adaptación respecto a ReMynder (3 estados lineales → 4 estados con
+  bifurcación en "abandonado"): en vez de botones prev/next de un solo paso,
+  cada tarjeta tiene un `<select>` que permite saltar a cualquiera de los 4
+  estados — fallback completo sin drag, no una versión reducida
+- El filtro de status se oculta en la vista Tablero (es redundante con las
+  columnas); el filtro de área funciona igual en ambas vistas
+- `moveBook(id, status)` como wrapper sobre `updateBook`, sin escritura si el
+  status no cambia
+- Docs: docs/research-kanban.md, docs/stories-kanban.md, docs/spec-kanban.md,
+  docs/test-report-kanban.md, docs/validation-kanban.md
+- Pendiente: verificación manual en navegador (drag desktop, select mobile,
+  carrusel) — no se hizo en esta sesión
 
 ### 2026-08-14 — Alta manual de libro + lista con filtros
 - CRUD completo de `users/{uid}/books/`: `addBook`, `updateBook`, `deleteBook`,
