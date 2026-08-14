@@ -6,7 +6,8 @@ de datos completo.
 
 ## Estado actual
 
-Fase 1, MVP, Entrega 1. Primera feature implementada: Login Google + multiusuario.
+Fase 1, MVP, Entrega 1. Features implementadas: Login Google + multiusuario,
+Alta manual de libro + lista con filtros.
 
 ## Proyecto Firebase
 
@@ -44,6 +45,31 @@ autorizada — el login solo funciona en los dos dominios estables de arriba.
   sea accesible por cualquier usuario, no solo por cuentas del team de Vercel
 
 ## Historial de cambios arquitecturales
+
+### 2026-08-14 — Alta manual de libro + lista con filtros
+- CRUD completo de `users/{uid}/books/`: `addBook`, `updateBook`, `deleteBook`,
+  listener reactivo con `onSnapshot(query(..., orderBy('createdAt')))`
+- Form único de alta/edición con todos los campos del modelo (incluidos
+  `cover`, `isbn`, `pages`, `startedAt`, `finishedAt` aunque Entrega 1 no
+  tenga autocompletado de API — se cargan a mano si el usuario quiere)
+- **Gestión de áreas mínima e implícita**: sin colección `areas` separada:
+  se derivan de `books` en memoria (`getAreaOptions()`). El form tiene
+  autocompletado (`<datalist>`) + normalización case-insensitive
+  (`normalizeArea()`) para evitar fragmentación ("Física" vs "física"). No
+  hay pantalla de administración de áreas todavía — decisión de alcance
+  documentada en docs/research-alta-libro.md, queda pendiente para una
+  feature futura si hace falta renombrar/fusionar áreas ya creadas
+  independientemente de tener libros cargados
+- Paleta de área `--p0`–`--p9` agregada a `:root` (dark + light), color de
+  área solo en dots/badges, nunca en píldoras de filtro (regla de CLAUDE.md)
+- Filtros combinables por `status` y `area`, en memoria (sin re-consultar Firestore)
+- Docs: docs/research-alta-libro.md, docs/stories-alta-libro.md,
+  docs/spec-alta-libro.md, docs/test-report-alta-libro.md,
+  docs/validation-alta-libro.md
+- 2 bugs menores encontrados y corregidos en la propia revisión (ver
+  test-report-alta-libro.md): timezone en fechas de inicio/fin de lectura,
+  CSS faltante para `.book-card-main`
+- Pendiente: verificación manual en navegador (no se hizo en esta sesión)
 
 ### 2026-08-13 — Login Google + multiusuario
 - Bootstrap de Firebase SDK (v10.12.0, CDN gstatic) en `web/index.html`:
