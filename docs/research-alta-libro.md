@@ -31,7 +31,7 @@ users/{uid}/books/{bookId}
 ```
 
 `status`: pendiente | leyendo | leido | abandonado (eje de progreso, Kanban)
-`priority`: curiosidad | interesado | must_have (eje de intención, metas Fase 2)
+`priority`: curiosidad | interesado | must_have | sin_especificar (eje de intención, metas Fase 2)
 Ambos ejes son independientes — no colapsar en un campo derivado.
 
 ## Dependencia con "gestión de áreas de conocimiento"

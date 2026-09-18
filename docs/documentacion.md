@@ -69,6 +69,31 @@ autorizada — el login solo funciona en los dos dominios estables de arriba.
 
 ## Historial de cambios arquitecturales
 
+### 2026-09-18 — `priority`: cuarto valor `sin_especificar`
+
+**Cambio de modelo de datos.** El eje de intención pasa de 3 a 4 valores:
+`curiosidad | interesado | must_have | sin_especificar`. El valor nuevo es
+**ausencia de intención**, no un nivel bajo de deseo — existe para los libros
+que se cargan como dato histórico, donde la prioridad no es accionable.
+
+- **Sin migración.** Los documentos existentes no se reescriben. La
+  normalización (`normalizePriority()`) se aplica **en memoria** en el mapeo del
+  `onSnapshot`, único punto de entrada de datos a la app: un valor ausente,
+  vacío o desconocido se lee como `sin_especificar` sin tocar Firestore. Un
+  libro existente solo cambia si el usuario lo edita y guarda a mano.
+- **Default por status en el alta** (`defaultPriorityForStatus()`):
+  `leido`/`abandonado` → `sin_especificar`; `pendiente`/`leyendo` → `curiosidad`
+  (el default que ya existía, sin cambios). Es **reactivo hasta que el usuario
+  toca la prioridad**: a partir de ahí el status deja de recalcularla.
+- **Los dos ejes siguen desacoplados.** El default vive exclusivamente en el
+  formulario de alta (guardas por `editingBookId === null` y
+  `formPriorityTouched`). Editar un libro existente o moverlo en el Kanban
+  **nunca** altera su `priority` — `moveBook()` escribe solo `status`.
+- **Contrato para Fase 2:** las metas de conocimiento deben tratar
+  `sin_especificar` como *no clasificado* y nunca sumarlo al progreso de un
+  objetivo. La semántica está documentada en CLAUDE.md, "Por qué dos ejes".
+- Sin CSS nuevo, sin dependencias nuevas, sin cambios en las Security Rules.
+
 ### 2026-08-14 — Torta de distribución por área
 - Tercera vista en `.view-switch` (Lista/Tablero/**Distribución**)
 - Gráfico de torta en **CSS puro** (`conic-gradient` + círculo superpuesto

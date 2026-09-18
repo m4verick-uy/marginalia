@@ -17,7 +17,8 @@ Campos y sus defaults al crear:
   contra áreas existentes al guardar)
 - `subarea` (string, default `''`)
 - `status` (string, default `'pendiente'`)
-- `priority` (string, default `'curiosidad'`)
+- `priority` (string, default `'curiosidad'` para status `pendiente`/`leyendo`,
+  `'sin_especificar'` para `leido`/`abandonado` — ver CLAUDE.md, "Por qué dos ejes")
 - `rating` (number, default `0`)
 - `notes` (string, default `''`)
 - `cover` (string, default `''`)

@@ -776,6 +776,7 @@
             <option value="curiosidad">Curiosidad</option>
             <option value="interesado">Interesado</option>
             <option value="must_have">Must-have</option>
+            <option value="sin_especificar">Sin especificar</option>
           </select>
         </div>
       </div>
@@ -884,12 +885,18 @@ const STATUSES = [
   { key: 'abandonado',  label: 'Abandonado' },
 ];
 
+// Eje de intención. Las etiquetas visibles viven en el <select> del form;
+// acá solo la lista controlada de valores válidos que se guardan en Firestore.
+// 'sin_especificar' es ausencia de intención, no un nivel bajo de deseo.
+const PRIORITIES = ['curiosidad', 'interesado', 'must_have', 'sin_especificar'];
+
 let books         = [];
 let unsubBooks     = null;
 let statusFilter   = 'all';
 let areaFilter     = null;
 let editingBookId  = null;
 let formRatingValue = 0;
+let formPriorityTouched = false;
 let viewMode           = localStorage.getItem('viewMode') || 'list';
 let dragBookId         = null;
 let boardDndController = null;
@@ -931,7 +938,10 @@ function startListeners(uid) {
   if (unsubBooks) unsubBooks();
   const qBooks = query(collection(db, 'users', uid, 'books'), orderBy('createdAt'));
   unsubBooks = onSnapshot(qBooks, snap => {
-    books = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    books = snap.docs.map(d => {
+      const data = d.data();
+      return { id: d.id, ...data, priority: normalizePriority(data.priority) };
+    });
     render();
   });
 }
@@ -984,6 +994,20 @@ function normalizeArea(input) {
 
 function parseAuthors(input) {
   return input.split(',').map(s => s.trim()).filter(Boolean);
+}
+
+// Lectura defensiva: los libros cargados antes de que existiera 'sin_especificar'
+// pueden no traer el campo. Se normaliza solo en memoria — nunca se reescribe
+// el documento en Firestore.
+function normalizePriority(value) {
+  return PRIORITIES.includes(value) ? value : 'sin_especificar';
+}
+
+// El status sugiere una prioridad inicial en el alta y nada más: los dos ejes
+// siguen siendo independientes. Un libro que se carga ya leído o abandonado no
+// tiene una intención de lectura que registrar.
+function defaultPriorityForStatus(status) {
+  return (status === 'leido' || status === 'abandonado') ? 'sin_especificar' : 'curiosidad';
 }
 
 function dateToTimestamp(dateStr) {
@@ -1054,7 +1078,9 @@ function openBookForm(book) {
   document.getElementById('book-area').value     = book ? book.area : '';
   document.getElementById('book-subarea').value  = book ? (book.subarea || '') : '';
   document.getElementById('book-status').value   = book ? book.status : 'pendiente';
-  document.getElementById('book-priority').value = book ? book.priority : 'curiosidad';
+  document.getElementById('book-priority').value = book
+    ? normalizePriority(book.priority)
+    : defaultPriorityForStatus('pendiente');
   document.getElementById('book-notes').value    = book ? (book.notes || '') : '';
   document.getElementById('book-cover').value    = book ? (book.cover || '') : '';
   document.getElementById('book-isbn').value     = book ? (book.isbn || '') : '';
@@ -1062,6 +1088,7 @@ function openBookForm(book) {
   document.getElementById('book-started').value  = book ? timestampToDateInputValue(book.startedAt) : '';
   document.getElementById('book-finished').value = book ? timestampToDateInputValue(book.finishedAt) : '';
   document.getElementById('book-form-error').textContent = '';
+  formPriorityTouched = false;
   formRatingValue = book ? (book.rating || 0) : 0;
   renderRatingInput();
   renderAreaOptionsDatalist();
@@ -1073,6 +1100,7 @@ function openBookForm(book) {
 function closeBookForm() {
   editingBookId = null;
   formRatingValue = 0;
+  formPriorityTouched = false;
   document.getElementById('book-form').style.display = 'none';
   document.getElementById('add-book-btn').style.display = '';
   document.getElementById('book-form').reset();
@@ -1434,6 +1462,17 @@ document.getElementById('logout-btn').addEventListener('click', logout);
 document.getElementById('add-book-btn').addEventListener('click', () => openBookForm(null));
 document.getElementById('cancel-book-btn').addEventListener('click', closeBookForm);
 document.getElementById('book-form').addEventListener('submit', submitBookForm);
+
+document.getElementById('book-priority').addEventListener('change', () => {
+  formPriorityTouched = true;
+});
+
+// En un alta nueva, el status sugiere la prioridad inicial hasta que el usuario
+// la elija a mano. Al editar un libro existente nunca se recalcula.
+document.getElementById('book-status').addEventListener('change', e => {
+  if (editingBookId !== null || formPriorityTouched) return;
+  document.getElementById('book-priority').value = defaultPriorityForStatus(e.target.value);
+});
 
 document.getElementById('book-rating-input').addEventListener('click', e => {
   const btn = e.target.closest('.star-btn');

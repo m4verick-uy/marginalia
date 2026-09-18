@@ -66,7 +66,7 @@ users/
         area:       string    — área de conocimiento (dimensión analítica central)
         subarea:    string    — subárea (opcional)
         status:     string    — EJE DE PROGRESO: "pendiente" | "leyendo" | "leido" | "abandonado"
-        priority:   string    — EJE DE INTENCIÓN: "curiosidad" | "interesado" | "must_have"
+        priority:   string    — EJE DE INTENCIÓN: "curiosidad" | "interesado" | "must_have" | "sin_especificar"
         rating:     number    — valoración 0–5 (0 = sin valorar)
         notes:      string    — marginalia: notas del lector
         cover:      string    — URL de portada (de la API o manual; vacío = placeholder)
@@ -84,6 +84,43 @@ users/
 - Son ortogonales: un libro puede ser `must_have` + `pendiente` (lo quiero sí o sí, no empecé),
   o `curiosidad` + `leido` (lo leí por curiosidad). Un solo campo perdería ese cruce, que es
   justo lo que el usuario quiere poder filtrar ("mis must-have que no empecé").
+
+#### `sin_especificar` — ausencia de intención
+
+Los otros tres valores implican algún grado de deseo activo. `sin_especificar` es el valor
+neutro: **no es un nivel bajo de deseo, es la ausencia de intención registrada**. Existe para
+los libros que se cargan como dato histórico (típicamente ya leídos o abandonados), donde la
+prioridad no es accionable y forzar una intención solo ensucia el eje.
+
+- **No es comparable con los otros tres.** No ordena por debajo de `curiosidad`: está fuera
+  de la escala de deseo, no en su extremo inferior.
+- **Semántica para las metas de conocimiento (Fase 2):** las metas cruzan `priority` + `area`
+  + `status`. `sin_especificar` se trata como **no clasificado** y **nunca** suma al progreso
+  de un objetivo. No cuenta como `must_have` ni como ningún otro nivel.
+- **Lectura defensiva:** un documento sin el campo, con el campo vacío o con un valor
+  desconocido se lee como `sin_especificar` (`normalizePriority()`, aplicado en el mapeo del
+  `onSnapshot`). Es normalización **en memoria**: nunca reescribe el documento en Firestore.
+  Los libros existentes conservan su valor hasta que el usuario los edite a mano.
+
+#### Default por status en el alta — no acopla los ejes
+
+El formulario de alta **sugiere** una prioridad inicial según el status elegido:
+
+| Status al cargar | `priority` por defecto |
+|---|---|
+| `pendiente`, `leyendo` | `curiosidad` |
+| `leido`, `abandonado` | `sin_especificar` |
+
+Tres límites que mantienen los dos ejes independientes:
+
+1. Es **solo una sugerencia del formulario de alta**. En cuanto el usuario elige una prioridad
+   a mano, cambiar el status deja de recalcularla.
+2. **Al editar un libro existente, cambiar su status nunca toca su `priority`.**
+3. **Mover un libro en el board Kanban nunca toca su `priority`** — `moveBook()` escribe
+   exclusivamente `status`.
+
+Derivar `priority` de `status` fuera del alta sería colapsar los dos ejes, que es justamente
+lo que este modelo evita.
 
 ### Por qué `area` es de primera clase
 
